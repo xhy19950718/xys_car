@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xys.car.mapper.CarMapper">
+    <select id="selectCar" resultType="com.xys.car.entity.CarSelect">
+        select
+            xc.id,
+            xc.name,
+            xc.price,
+            xc.useyear,
+            xc.uselong,
+            xc.createtime,
+            xc.hot,
+            xc.del,
+            xc.paint,
+            xc.recommend,
+            xc.accident
+            b.name brand,
+            e.name entity,
+            c.name color,
+            t.name type,
+            y.name caryear,
+
+            FROM
+            xys_car xc
+            LEFT JOIN xys_brand b ON b.id = xc.brand
+            LEFT JOIN xys_entity e ON xc.entity = e.id
+            LEFT JOIN xys_color c ON c.id = xc.color
+            LEFT JOIN xys_type t ON t.id = xc.type
+            LEFT JOIN caryear y ON y.id = xc.xys_caryear
+    </select>
+</mapper>
