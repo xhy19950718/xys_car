@@ -3,6 +3,9 @@ package com.xys.car.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.xys.car.common.CommonUtil;
 import com.xys.car.entity.Brand;
 import com.xys.car.entity.Car;
 import com.xys.car.entity.CarSelect;
@@ -31,41 +34,48 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements ICarS
     //标准列表
     @Override
     public RootEntity selectCar(CarSelect car) {
+        PageHelper.startPage(car.getPageNum(), car.getPageSize());
         List<Car> listInfo = baseMapper.selectCar(car);
-        IPage<Car> pageInfo = new Page(car.getPageNum(),car.getPageSize());
-        IPage iPage = baseMapper.selectPage(pageInfo, queryWrapper);
-
-        return null;
+        PageInfo pageInfo = new PageInfo(listInfo);
+        return new RootEntity(pageInfo);
     }
 
     @Override
     public RootEntity updateCar(Car car) {
-        if (baseMapper.selectById(car.getId())!=null){
-            int i = baseMapper.updateById(car);
-            if(i>0){
-                return new RootEntity();
-            }
+        if(car==null){
+            return new RootEntity(500,"不能为空！",null);
         }
-        return new RootEntity();
+        if(baseMapper.selectById(car.getId())==null){
+            return new RootEntity(500,"操作对象不存在",null);
+        }
+        if(baseMapper.updateById(car)>0){
+            return new RootEntity();
+        }
+        return new RootEntity(500,"未知错误",null);
     }
 
     @Override
-    public RootEntity deleteCar(Car car) {//删除
-        if(baseMapper.selectById(car.getId())!=null){
-            if(baseMapper.deleteById(car.getId())>0){
-                return new RootEntity();
-            }
+    public RootEntity deleteCar(Car car) {
+        //删除
+        if(car.getId()==null && car.getId()==""){
+            return new RootEntity(500,"id不能为空！",null);
         }
-        return new RootEntity();
+        if(baseMapper.selectById(car.getId())==null){
+            return new RootEntity(500,"操作对象不存在",null);
+        }
+        if(baseMapper.deleteById(car.getId())>0){
+            return new RootEntity();
+        }
+        return new RootEntity(500,"未知错误",null);
     }
 
     @Override
     public RootEntity insertCar(Car car) {
-        car.setId(UUID.randomUUID().toString());
+        car.setId(CommonUtil.getId());
         if(baseMapper.insert(car)>0){
             return new RootEntity();
         }
-        return new RootEntity();
+        return new RootEntity(500,"未知错误",null);
     }
 
     @Override
@@ -81,42 +91,4 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements ICarS
         List<Car> list = baseMapper.selectList(queryWrapper);
         return new RootEntity(200,"ok",list);
     }
-
-    //推荐车型
-    public List<Car> vipList(CarSelect car){
-        QueryWrapper queryWrapper = new QueryWrapper();
-        if(car.getBrand()!=null){
-            queryWrapper.eq("brand",car.getBrand());
-        }
-        if(car.getColor()!=null){
-            queryWrapper.eq("color",car.getColor());
-        }
-        if(car.getEntity()!=null){
-            queryWrapper.eq("entity",car.getEntity());
-        }
-        if(car.getName()!=null){
-            queryWrapper.like("name",car.getName());
-        }
-        if(car.getType()!=null){
-            queryWrapper.eq("type",car.getType());
-        }
-        if(car.getCaryear()!=null){
-            queryWrapper.eq("caryear",car.getCaryear());
-        }
-        if(car.getPriceend()!=null){
-            queryWrapper.gt("price",car.getPricestart());
-        }
-        if(car.getPricestart()!=null){
-            queryWrapper.lt("price",car.getPriceend());
-        }
-        if(car.getPriceend()!=null && car.getPricestart()!=null){
-            queryWrapper.between("price",car.getPricestart(),car.getPriceend());
-        }
-        queryWrapper.eq("del",0);
-        queryWrapper.eq("recommend",1);
-        List<Car> list = baseMapper.selectList(queryWrapper);
-        return list;
-    }
-
-
 }

@@ -27,5 +27,33 @@
             LEFT JOIN xys_color c ON c.id = xc.color
             LEFT JOIN xys_type t ON t.id = xc.type
             LEFT JOIN caryear y ON y.id = xc.xys_caryear
+            where xc.del = 0
+            <if test="name!=null and name!=''">
+                and instr(name,"#{name}")
+            </if>
+            <if test="color!=null and color!+''">
+                and color=#{color}
+            </if>
+            <if test="brand!=null and brand!=''">
+                and brand = #{brand}
+            </if>
+            <if test="entity!=null and entity!=''">
+                and entity = #{entity}
+            </if>
+            <if test="type!=null and type!+''">
+                and type = #{type}
+            </if>
+            <if test="caryear!=null and caryear!=''">
+                and caryear = #{caryear}
+            </if>
+            <if test="priceend!=null and pricestart==null">
+                and price lt; priceend
+            </if>
+            <if test="pricestart!=null and priceend==null">
+                and price gt; pricestart
+            </if>
+            <if test="pricestart!=null and priceend!=null">
+                and price between  #{pricestart} and #{priceend}
+            </if>
     </select>
 </mapper>

@@ -52,6 +52,11 @@ public class CarController {
         return iCarService.insertCar(car);
     }
 
+    //添加车辆
+    @PostMapping("getOneCar")
+    public RootEntity getOneCar(@RequestBody Car car){
+        return iCarService.getById(car.getId());
+    }
     //预警车辆
     @PostMapping("timeoutcar")
     public RootEntity timeOutCar(){
